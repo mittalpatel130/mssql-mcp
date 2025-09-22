@@ -169,7 +169,8 @@ async def main():
                         raise ValueError("Invalid query type for read_query, must be a SELECT or WITH statement")
                     results = db._execute_query(arguments["query"])
                     span.set_attribute("http.response.status_code", 200)
-                    return [types.TextContent(type="text", text=str(results))]
+                    #return [types.TextContent(type="text", text=str(results))]
+                    return [types.TextContent(type="text", text=json.dumps(str(results), ensure_ascii=False))]
 
                 raise ValueError(f"Error: {name}")
             except pymssql.Error as e:
