@@ -152,7 +152,7 @@ async def main():
                         """
                         SELECT TABLE_NAME as name 
                         FROM INFORMATION_SCHEMA.TABLES 
-                        WHERE TABLE_TYPE = 'BASE TABLE'
+                        WHERE TABLE_TYPE IN ('BASE TABLE', 'VIEW')
                         """
                     )
                     table_info = {}
