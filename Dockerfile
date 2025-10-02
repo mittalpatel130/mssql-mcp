@@ -1,4 +1,6 @@
 FROM python:3.11-slim
+FROM debian:11
+
 
 # Set work directory
 WORKDIR /app
@@ -9,7 +11,9 @@ COPY . /app
 # Install system dependencies for pyodbc and SQL Server ODBC driver
 RUN apt-get update && \
     apt-get install -y curl gnupg2 && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    #curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    # Add Microsoft GPG key
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg \
     curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get update && \
     ACCEPT_EULA=Y apt-get install -y gcc g++ msodbcsql17 unixodbc-dev && \
