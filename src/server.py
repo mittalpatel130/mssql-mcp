@@ -204,7 +204,8 @@ async def main():
                     query_upper = arguments["query"].strip().upper()
                     if not (query_upper.startswith("SELECT") or query_upper.startswith("WITH")):
                         raise ValueError("Invalid query type for read_query, must be a SELECT or WITH statement")
-                    results = db._execute_query(arguments["query"])
+                    # results = db._execute_query(arguments["query"])
+                    results = db._execute_query(arguments["query"], arguments.get("params")) # modified by sai
                     span.set_attribute("http.response.status_code", 200)
 
                     response = {"results": []}
