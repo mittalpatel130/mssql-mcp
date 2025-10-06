@@ -113,6 +113,18 @@ async def main():
     async def handle_list_tools() -> list[types.Tool]:
         """List available tools for the MCP server"""
         return [
+            # types.Tool(
+            #     name="read_query",
+            #     description="Execute SELECT queries on the MSSQL database",
+            #     inputSchema={
+            #         "type": "object",
+            #         "properties": {
+            #             "query": {"type": "string", "description": "SQL query to execute"},
+            #         },
+            #         "required": ["query"],
+            #     },
+            # ),
+            # added by sai
             types.Tool(
                 name="read_query",
                 description="Execute SELECT queries on the MSSQL database",
@@ -120,10 +132,16 @@ async def main():
                     "type": "object",
                     "properties": {
                         "query": {"type": "string", "description": "SQL query to execute"},
+                        "params": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Optional parameters for the query"
+                        },
                     },
                     "required": ["query"],
                 },
             ),
+            # till here
             types.Tool(
                 name="list_tables",
                 description="List database tables",
