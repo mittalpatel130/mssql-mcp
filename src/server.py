@@ -113,18 +113,6 @@ async def main():
     async def handle_list_tools() -> list[types.Tool]:
         """List available tools for the MCP server"""
         return [
-            # types.Tool(
-            #     name="read_query",
-            #     description="Execute SELECT queries on the MSSQL database",
-            #     inputSchema={
-            #         "type": "object",
-            #         "properties": {
-            #             "query": {"type": "string", "description": "SQL query to execute"},
-            #         },
-            #         "required": ["query"],
-            #     },
-            # ),
-            # added by sai
             types.Tool(
                 name="read_query",
                 description="Execute SELECT queries on the MSSQL database",
@@ -132,16 +120,10 @@ async def main():
                     "type": "object",
                     "properties": {
                         "query": {"type": "string", "description": "SQL query to execute"},
-                        "params": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "description": "Optional parameters for the query"
-                        },
                     },
                     "required": ["query"],
                 },
             ),
-            # till here
             types.Tool(
                 name="list_tables",
                 description="List database tables",
@@ -204,10 +186,9 @@ async def main():
                     query_upper = arguments["query"].strip().upper()
                     if not (query_upper.startswith("SELECT") or query_upper.startswith("WITH")):
                         raise ValueError("Invalid query type for read_query, must be a SELECT or WITH statement")
-                    # results = db._execute_query(arguments["query"])
-                    results = db._execute_query(arguments["query"], arguments.get("params")) # modified by sai
+                    results = db._execute_query(arguments["query"])
                     span.set_attribute("http.response.status_code", 200)
-                    logger.info(f"Plain results: {results}") #added by sai
+
                     response = {"results": []}
                     for result in results:
                         response["results"].append(result)
