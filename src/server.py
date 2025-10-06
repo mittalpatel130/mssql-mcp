@@ -207,7 +207,7 @@ async def main():
                     # results = db._execute_query(arguments["query"])
                     results = db._execute_query(arguments["query"], arguments.get("params")) # modified by sai
                     span.set_attribute("http.response.status_code", 200)
-
+                    logger.info(f"Plain results: {results}") #added by sai
                     response = {"results": []}
                     for result in results:
                         response["results"].append(result)
