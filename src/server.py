@@ -3,9 +3,6 @@ import json
 import pymssql
 import logging
 import socket
-import decimal
-import datetime
-import uuid
 from contextlib import closing
 from mcp.server.models import InitializationOptions
 import mcp.types as types
@@ -83,22 +80,6 @@ class Database:
         except Exception as e:
             logger.error(f"Exception: {e}")
             raise
-
-    def make_json_safe(self, obj):
-        if isinstance(obj, list):
-            return [self.make_json_safe(item) for item in obj]
-        elif isinstance(obj, dict):
-            return {k: self.make_json_safe(v) for k, v in obj.items()}
-        elif isinstance(obj, decimal.Decimal):
-            return float(obj)
-        elif isinstance(obj, uuid.UUID):
-            return str(obj)
-        elif isinstance(obj, (datetime.datetime, datetime.date)):
-            return obj.isoformat()
-        elif isinstance(obj, bytes):
-            return obj.decode('utf-8', errors='replace')
-        else:
-            return obj
 
 async def main():
     logger.info("Starting MSSQL Server")
@@ -187,18 +168,14 @@ async def main():
                     if not (query_upper.startswith("SELECT") or query_upper.startswith("WITH")):
                         raise ValueError("Invalid query type for read_query, must be a SELECT or WITH statement")
                     results = db._execute_query(arguments["query"])
-                    logger.info(f"Database Results: {results}")
                     span.set_attribute("http.response.status_code", 200)
 
                     response = {"results": []}
                     for result in results:
                         response["results"].append(result)
-                    # Before json.dumps:
-                    safe_response = db.make_json_safe(response)
-                    logger.info(f"Response: {safe_response}")
                     return [
                         types.TextContent(
-                            type="text", text=json.dumps(safe_response, ensure_ascii=False, indent=2)
+                            type="text", text=json.dumps(results, ensure_ascii=False, indent=2)
                         )
                     ]
 
