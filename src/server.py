@@ -3,6 +3,7 @@ import json
 import pymssql
 import logging
 import socket
+import datetime #added by sai
 from contextlib import closing
 from mcp.server.models import InitializationOptions
 import mcp.types as types
@@ -167,18 +168,35 @@ async def main():
                     query_upper = arguments["query"].strip().upper()
                     if not (query_upper.startswith("SELECT") or query_upper.startswith("WITH")):
                         raise ValueError("Invalid query type for read_query, must be a SELECT or WITH statement")
+                    # results = db._execute_query(arguments["query"])
+                    # span.set_attribute("http.response.status_code", 200)
+
+                    # response = {"results": []}
+                    # for result in results:
+                    #     response["results"].append(result)
+                    # return [
+                    #     types.TextContent(
+                    #         type="text", text=json.dumps(results, ensure_ascii=False, indent=2)
+                    #     )
+                    # ]
+                    #added by sai
                     results = db._execute_query(arguments["query"])
                     span.set_attribute("http.response.status_code", 200)
 
-                    response = {"results": []}
-                    for result in results:
-                        response["results"].append(result)
+                    # ✅ Convert datetime and date objects to string (ISO format)
+                    for row in results:
+                        for key, value in row.items():
+                            if isinstance(value, (datetime.datetime, datetime.date)):
+                                row[key] = value.isoformat()
+
+                    # ✅ Return JSON-safe response
                     return [
                         types.TextContent(
-                            type="text", text=json.dumps(results, ensure_ascii=False, indent=2)
+                            type="text",
+                            text=json.dumps(results, ensure_ascii=False, indent=2)
                         )
                     ]
-
+                    #added by sai ends here
                 raise ValueError(f"Error: {name}")
             except pymssql.Error as e:
                 span.record_exception(e)
