@@ -4,6 +4,7 @@ import pymssql
 import logging
 import socket
 import datetime #added by sai
+import decimal #added by sai
 from contextlib import closing
 from mcp.server.models import InitializationOptions
 import mcp.types as types
@@ -188,6 +189,8 @@ async def main():
                         for key, value in row.items():
                             if isinstance(value, (datetime.datetime, datetime.date)):
                                 row[key] = value.isoformat()
+                            elif isinstance(value, decimal.Decimal):
+                                row[key] = float(value)  # convert Decimal to float    
 
                     # ✅ Return JSON-safe response
                     return [
